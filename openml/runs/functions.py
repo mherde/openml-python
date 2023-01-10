@@ -30,6 +30,7 @@ from ..tasks import (
     OpenMLClusteringTask,
     OpenMLRegressionTask,
     OpenMLSupervisedTask,
+    OpenMLActiveClassificationTask,
     OpenMLLearningCurveTask,
 )
 from .run import OpenMLRun
@@ -505,7 +506,7 @@ def _run_task_get_arffcontent(
         def _calculate_local_measure(sklearn_fn, openml_name):
             user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
 
-        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask, OpenMLActiveClassificationTask)):
 
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
@@ -1187,7 +1188,7 @@ def format_prediction(
     A list with elements for the prediction results of a run.
 
     """
-    if isinstance(task, OpenMLClassificationTask):
+    if isinstance(task, (OpenMLClassificationTask, OpenMLActiveClassificationTask)):
         if proba is None:
             raise ValueError("`proba` is required for classification task")
         if task.class_labels is None:

@@ -19,6 +19,7 @@ from .task import (
     OpenMLRegressionTask,
     OpenMLSupervisedTask,
     OpenMLTask,
+    OpenMLActiveClassificationTask,
 )
 import openml.utils
 import openml._api_calls
@@ -507,6 +508,7 @@ def create_task(
         TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
         TaskType.CLUSTERING: OpenMLClusteringTask,
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
+        TaskType.ACTIVE_CLASSIFICATION: OpenMLActiveClassificationTask,
     }.get(task_type)
 
     if task_cls is None:
