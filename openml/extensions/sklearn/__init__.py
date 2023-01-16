@@ -8,7 +8,6 @@ __all__ = ["SklearnExtension"]
 
 register_extension(SklearnExtension)
 
-
 def cont(X):
     """Returns True for all non-categorical columns, False for the rest.
 

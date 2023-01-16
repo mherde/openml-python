@@ -118,3 +118,4 @@ __all__ = [
 
 # Load the scikit-learn extension by default
 import openml.extensions.sklearn  # noqa: F401
+import openml.extensions.skactiveml  # noqa: F401

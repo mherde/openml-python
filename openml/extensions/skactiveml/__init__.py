@@ -6,7 +6,6 @@ __all__ = ["SkactivemlExtension"]
 
 register_extension(SkactivemlExtension)
 
-
 def cont(X):
     """Returns True for all non-categorical columns, False for the rest.
 
