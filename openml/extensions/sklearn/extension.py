@@ -34,7 +34,6 @@ from openml.tasks import (
     OpenMLLearningCurveTask,
     OpenMLClusteringTask,
     OpenMLRegressionTask,
-    OpenMLActiveClassificationTask
 )
 
 logger = logging.getLogger(__name__)
@@ -1717,7 +1716,7 @@ class SklearnExtension(Extension):
             # typically happens when training a regressor on classification task
             raise PyOpenMLError(str(e))
 
-        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask, OpenMLActiveClassificationTask)):
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             # search for model classes_ (might differ depending on modeltype)
             # first, pipelines are a special case (these don't have a classes_
             # object, but rather borrows it from the last step. We do this manually,
@@ -1765,7 +1764,7 @@ class SklearnExtension(Extension):
             modelfit_dur_walltime + modelpredict_duration_walltime + refit_time
         )
 
-        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask, OpenMLActiveClassificationTask)):
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
 
             try:
                 proba_y = model_copy.predict_proba(X_test)
