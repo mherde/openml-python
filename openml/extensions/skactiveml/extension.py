@@ -43,6 +43,9 @@ from openml.tasks import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 class SkactivemlExtension(SklearnExtension):
     @classmethod
     def can_handle_flow(cls, flow: "OpenMLFlow") -> bool:
@@ -430,3 +433,80 @@ class SkactivemlExtension(SklearnExtension):
             trace = None
 
         return pred_y, proba_y, user_defined_measures, trace
+
+    def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
+        """Fetches the sklearn function docstring for the flow description
+
+        Retrieves the sklearn docstring available and does the following:
+        * If length of docstring <= char_lim, then returns the complete docstring
+        * Else, trims the docstring till it encounters a 'Read more in the :ref:'
+        * Or till it encounters a 'Parameters\n----------\n'
+        The final string returned is at most of length char_lim with leading and
+        trailing whitespaces removed.
+
+        Parameters
+        ----------
+        model : sklearn model
+        char_lim : int
+            Specifying the max length of the returned string.
+            OpenML servers have a constraint of 1024 characters for the 'description' field.
+
+        Returns
+        -------
+        str
+        """
+
+        s = inspect.getdoc(model)
+        if s is None:
+            return ""
+        # trimming docstring to be within char_lim
+        if len(s) > char_lim:
+            s = "{}...".format(s[: char_lim - 3])
+        return s.strip()
+
+    def _extract_sklearn_parameter_docstring(self, model) -> Union[None, str]:
+        """Extracts the part of sklearn docstring containing parameter information
+
+        Fetches the entire docstring and trims just the Parameter section.
+        The assumption is that 'Parameters' is the first section in sklearn docstrings,
+        followed by other sections titled 'Attributes', 'See also', 'Note', 'References',
+        appearing in that order if defined.
+        Returns a None if no section with 'Parameters' can be found in the docstring.
+
+        Parameters
+        ----------
+        model : sklearn model
+
+        Returns
+        -------
+        str, or None
+        """
+
+        def match_format(s):
+            return "{}\n{}\n".format(s, len(s) * "-")
+
+        s = inspect.getdoc(model)
+        if s is None:
+            return None
+        try:
+            index1 = s.index(match_format("Parameters"))
+        except ValueError as e:
+            # when sklearn docstring has no 'Parameters' section
+            logger.warning("{} {}".format(match_format("Parameters"), e))
+            return None
+
+        # headings = ["Attributes", "Notes", "See also", "Note", "References"]
+        # for h in headings:
+        #     try:
+        #         # to find end of Parameters section
+        #         index2 = s.index(match_format(h))
+        #         break
+        #     except ValueError:
+        #         logger.warning("{} not available in docstring".format(h))
+        #         continue
+        # else:
+        #     # in the case only 'Parameters' exist, trim till end of docstring
+        #     index2 = len(s)
+        index2 = len(s)
+        s = s[index1:index2]
+        return s.strip()
